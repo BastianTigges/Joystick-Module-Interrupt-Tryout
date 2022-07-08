@@ -14,6 +14,9 @@
 //define wakeup pin
 #define expanderInterrupt GPIO_NUM_14
 
+//define interrupt pin on ESP32
+#define espInterrupt 34
+
 
 //create pcf8574 object
 PCF8574 pcf20(0x20);
@@ -21,6 +24,9 @@ PCF8574 pcf20(0x20);
 //button pins on I/O expander
 #define rockerSwitch1 0
 #define rockerSwitch2 1
+
+//interrupt service routine
+void readButtons();
 
 
 
@@ -40,6 +46,9 @@ void setup() {
   //setuip wake up of ESP
   esp_sleep_enable_ext0_wakeup(expanderInterrupt, LOW);
 
+  //set up interrupt in ESP to read I/O
+  attachInterrupt(34, readButtons, LOW);
+
 }
 
 void loop() {
@@ -52,8 +61,13 @@ void loop() {
     digitalWrite(controlLED1, LOW);
     digitalWrite(controlLED2, LOW);
     digitalWrite(controlLedSleep, LOW);
-    esp_deep_sleep_start();
+    //esp_deep_sleep_start();
   }
+
+
+}
+
+void IRAM_ATTR readButtons(){
 
   digitalWrite(controlLedSleep, LOW);
 
@@ -70,5 +84,7 @@ void loop() {
   else{
     digitalWrite(controlLED2, LOW);
   }
+
+  delay(100);
 
 }
